@@ -72,23 +72,12 @@ const FontSelector = ({ font, handleSetFont }) => (
   </FormControl>
 );
 
-const DarkModeToggle = ({ handleDarkModeToggle, darkModeTopbar }) => (
-  <FormGroup>
-    <FormControlLabel
-      control={<Switch onChange={handleDarkModeToggle} checked={darkModeTopbar} />}
-      label="Dark Mode"
-    />
-  </FormGroup>
-);
-
 const Sidebar = ({
   drawerIsOpen = true,
   sidebarList,
   onClick,
-  handleDarkModeToggle,
   activeFont,
   handleSetFont,
-  darkModeTopbar
 }) => {
   return (
     <Drawer variant="permanent" open={drawerIsOpen}>
@@ -139,11 +128,6 @@ const Sidebar = ({
       <Box position={"fixed"} bottom={"15"} width={"220"} marginLeft={"15"}>
         {drawerIsOpen && (
           <FontSelector font={activeFont} handleSetFont={handleSetFont} />
-        )}
-      </Box>
-      <Box position={"fixed"} bottom={"75"} width={"220"} marginLeft={"50"}>
-        {drawerIsOpen && (
-          <DarkModeToggle handleDarkModeToggle={handleDarkModeToggle} darkModeTopbar={darkModeTopbar} />
         )}
       </Box>
     </Drawer>
