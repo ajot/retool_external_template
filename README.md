@@ -1,90 +1,71 @@
 # Retool External Template
 
+A React app that can be used as a template for embedding Retool Apps. It uses [Auth0 React SDK](https://auth0.github.io/auth0-react/) to add authentication, and [react-retool](https://www.npmjs.com/package/react-retool) wrapper for embedding the Retool apps. 
+
 ![Demo gif](docs/demo.gif)
 
-## Quick instructions (dev mode)
+## What is Retool Embed?
+Retool Embed is a way to let external users––partners, vendors, customers––securely access embedded Retool apps within your product. You can use any authentication solution to give users access, and then control app behavior, data access, and audit usage on a per-user basis. You can learn more about Retool Embed [here](https://docs.retool.com/docs/embed-retool-apps).
+
+## How Retool Embed works
+Retool Embed doesn't change much in how you build in Retool. You still use resources, components, and queries to build your apps.
+
+1. External user signs into your portal
+2. Your portal tells Retool they have access to Retool apps A, B, and C
+3. Retool generates a secure embed link
+4. Your portal loads the embedded Retool apps
+
+You can learn more about [how Retool Embed works here.](https://docs.retool.com/docs/retool-embed#how-retool-embed-works)
+
+## Getting Started
 
 1. Clone repo
-2. Run `yarn install`
-3. Run `cp start.example start`
-4. Run `./start`
-5. Open `http:\\localhost:3001` in browser
-6. (Optional) Change configuration in `\config.js`
+2. Setup the Frontend
+    - Run `cp frontend/config-example.js frontend/config.js` 
+    - Update `frontend/config.js` with your Auth0 credentials (Domain and ClientID). See [this guide](https://auth0.com/docs/quickstart/spa/react#configure-auth0).
+3. Setup the Backend
+    - Run `cp backend/.env.example backend/.env` 
+    - Update `backend/.env` file to configure your RETOOL_API_KEY, RETOOL_URL, and BACKEND_PORT.
+4. Run `yarn install`
+5. Run `./start`
+6. Open `http:\\localhost:3001` in browser
 
-## Configuration
-
-Configuration is performed by updating two files in the project root directory:
-
-1. /config.js - variables, menu choices, themes, etx
-2. /start – environment variables and startup script
-
-Note that to avoid secrets being uploaded to the git repo, you will need to copy the `start.example` template before running the application.
+## More Configuration
+Most of the configuration is inside the `frontend/config.js`, including names of Retool Apps to embed, Auth0 credentials, Sidebar links, Formatting preferences (colors, fonts). 
 
 ## Repo structure
+Mono-repo. Single project, but each of frontend and backend can be run separately.
 
-- Mono-repo. Single project, but each of frontend and backend can be run separately.
-- No cross-dependencies EXCEPT:
-  - Any API calls built into the front end
-  - Shared configuration for easy changes by field engineers in a POC
+### Frontend is a React app served from `/frontend/app.js`.
 
-## Backend - /backend
+```
+└── frontend/
+    ├── public/
+    │   ├── index.html  // HTML file for the React app
+    ├── src/
+    │   ├── App.js      // main component that renders the app
+    │   ├── index.js    // entry point for the app
+    │   ├── index.css   // CSS file for the index.html file
+    │   └── components/ // directory containing reusable React components
+    │       ├── Auth0ProviderWithHistory.js // component for authenticating users with Auth0
+    │       ├── RetoolWrapper.js // component for wrapping Retool components. Makes a POST request to the backend to get the embed URL (route for the POST request is specified in backend/routes/retool.js)
+    │       ├── Sidebar.js // component for a sidebar navigation menu
+    │       └── Topbar.js // component for a top navigation bar
+    │   └── pages/ // includes the splash page for login    
+    ├── package.json    // file for managing dependencies
+```
 
-Express.js server, built using `npx express-generator`
+### Backend is an Express server served from `/backend/server.js`.
 
-Folder: routes
-### index.js
-- / serves up the React app
-
-### api.js
-- /api/protected  Currently, simply provides a json verifies it has been sent a valid JWT
-
-### auth.js
-- /auth/register  Returns a JWT in a JSON response, currently using the default_user
-
-Folder: utils
-### jwt.js
-- generateToken()
-- authenticateToken()
-
-## Frontend -  /frontend
-
-frontend/ : bare React app
-
-_Each page of the app has a folder in **/frontend/src/pages**_
-
-## auth0_scripts
-
-Using Rules:
-
-https://manage.auth0.com/dashboard/us/APP_ID/rules
-
-Using Actions:
-
-https://manage.auth0.com/dashboard/us/APP_ID/actions/flows/login/
-## Development notes
-
-### Adding a new library
-
-`yarn workspace backend add jsonwebtoken`
-
-When adding a new environment variable, add it to:
-- /workspace/.env.example
-- /start.example
-
-### Adding a new top level route
-
-Update `devServer.proxy.context` in `/frontend/webpack.config.js`:
-
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    port: process.env.PBL_DEV_PORT || 3001,
-    proxy: {
-      context: ['/auth', '/api'],
-      target: ['http://localhost', process.env.PBL_PORT || '3000'].join(':')
-    }
-  },
-
-### Running test API calls
-
-1. Install 'REST Client' VS Code extension
-2. Use calls defined in requests.rest for testing
+```
+└── backend/
+    ├── public/                // directory for serving static files
+    │   └── index.html         // HTML file for the server's default page
+    ├── routes/                 // directory containing route handlers
+    │   ├── index.js            // entry point for the routes directory
+    │   ├── retool.js           // route handler for the /api/embedUrl endpoint. Makes a request to Retool to get the embed URL.
+    ├── utils/                 // directory for utility functions
+    │   └── retoolAppsToUuids.js // utility function for converting Retool app names to UUIDs
+    ├── server.js               // entry point for the server. Specifies the router files to use (index.js, retool.js)
+    ├── package.json           // file for managing dependencies
+```
