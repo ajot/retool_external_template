@@ -2,8 +2,8 @@ exports.deployOnLocalhost = true;
 
 exports.auth = {
   tokenDuration: "1800s",
-  REACT_APP_AUTH0_DOMAIN: "dev-lekm7di5.us.auth0.com",
-  REACT_APP_AUTH0_CLIENT_ID: "XTvdIg69eapUmPCYItBeiLfmzLnChB5Q",
+  REACT_APP_AUTH0_DOMAIN: "YOUR_AUTH0_DOMAIN",
+  REACT_APP_AUTH0_CLIENT_ID: "YOUR_AUTH0_DOMAIN",
   REACT_APP_AUTH0_SCOPE: "read:current_user update:current_user_metadata",
 };
 
